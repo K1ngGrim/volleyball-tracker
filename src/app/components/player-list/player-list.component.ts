@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, inject} from '@angular/core';
 import {MatCard, MatCardContent} from '@angular/material/card';
-import {JsonPipe, NgClass} from '@angular/common';
-import {CdkDrag, CdkDragPlaceholder, CdkDragPreview, CdkDropList} from '@angular/cdk/drag-drop';
+import {NgClass} from '@angular/common';
+import {CdkDrag, CdkDragPreview, CdkDropList} from '@angular/cdk/drag-drop';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {GameService} from '../../services/game.service';
 import {MatIcon} from '@angular/material/icon';
@@ -21,8 +21,6 @@ import {CdkScrollable} from '@angular/cdk/scrolling';
     CdkDragPreview,
     MatIcon,
     MatIconButton,
-    JsonPipe,
-    CdkDragPlaceholder,
     CdkScrollable
   ],
   templateUrl: './player-list.component.html',

@@ -1,9 +1,7 @@
-import {ChangeDetectorRef, computed, effect, inject, Injectable, signal} from '@angular/core';
+import {computed, effect, Injectable, signal} from '@angular/core';
 import {Player} from '../components/player-list/player-list.component';
 import {downloadCsv, getOrCreate, isFrontRow, teamHasWonSet} from '../helper/Helper';
 import {Actions} from '../components/court/court.component';
-import {MatDialog} from '@angular/material/dialog';
-import {PlayerDialogComponent} from '../components/player-dialog/player-dialog.component';
 
 @Injectable({
   providedIn: 'root'
