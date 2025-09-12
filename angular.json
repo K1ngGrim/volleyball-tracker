@@ -58,7 +58,7 @@
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.scss"
-            ],
+            ]
           },
           "configurations": {
             "production": {
@@ -74,12 +74,18 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "outputPath": {
+                "base": "dist/volleyball-tracker"
+              }
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "outputPath": {
+                "base": "dist/volleyball-tracker"
+              }
             }
           },
           "defaultConfiguration": "production"
