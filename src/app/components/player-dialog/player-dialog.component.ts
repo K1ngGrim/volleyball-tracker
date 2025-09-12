@@ -41,6 +41,12 @@ export class PlayerDialogComponent {
 
   onSubmit() {
     if (this.form.invalid) return;
+
+    if(this.gameService.players().some(p => p.number === this.form.value.number)) {
+      alert('Player number already exists!');
+      return;
+    }
+
     const player: Player = {
       number: this.form.value.number,
       name: this.form.value.name,

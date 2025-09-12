@@ -440,6 +440,25 @@ export class GameService {
 
     downloadCsv('player-stats.csv', rows);
   }
+
+  public reset() {
+    this.history.set([]);
+    this.gameState.set({
+      homeScore: 0,
+      awayScore: 0,
+      currentServer: 'home',
+      currentSet: 1,
+      homeSetsWon: 0,
+      awaySetsWon: 0,
+      rotation: Array(6).fill(null)
+    });
+
+    this.matchStatus.set('notStarted');
+    this.playerStats.set(new Map());
+    this.previousSets.set([]);
+    this.matchTime.set(0);
+    if (this.timerInterval) clearInterval(this.timerInterval);
+  }
 }
 
 export interface Action {

@@ -7,6 +7,8 @@
     <button mat-stroked-button color="accent" (click)="gameService.exportPreviousSetsCsv()">Spielhistorie exportieren</button>
     <button mat-stroked-button color="accent" (click)="gameService.exportPlayerStatsCsv()">Statistiken exportieren</button>
 
+    <button mat-stroked-button [color]="'warn'" class="ms-auto" (click)="gameService.reset()">Zurücksetzen</button>
+
   </div>
   @if (gameService.gameState(); as state) {
     <div class="d-flex justify-content-center align-items-center w-100 mb-2">
