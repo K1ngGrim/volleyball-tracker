@@ -1,0 +1,114 @@
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.player-list-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+
+.player-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  h5 {
+    margin: 0;
+  }
+}
+
+.player-list-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 100%;
+  padding-bottom: 1rem;
+  overflow-y: auto;
+  align-items: flex-start; // wichtig, sonst „stretch“ und evtl. cut
+}
+
+
+.player-card {
+  flex: 0 0 30%;
+  min-width: 150px;
+  max-width: 200px;
+  cursor: grab;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  &.libero {
+    border-left: 4px solid #ff4081;
+    background: #ffe6f0;
+  }
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.player-number {
+  font-weight: bold;
+  width: 2rem;
+  text-align: center;
+}
+
+.player-name {
+  font-size: 0.9rem;
+}
+
+.player-stats {
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  div {
+    min-width: 25px;  // verhindert zu kleine Boxen
+  }
+}
+
+// Drag & Drop
+.placeholder {
+  opacity: 0.3;
+  border: 1px dashed #ccc;
+}
+
+.preview {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border-radius: 4px;
+}
+
+// Drag Preview Box
+.preview-box {
+  background: lightgray;
+  border-radius: 8px;
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Responsive Anpassungen
+@media (max-width: 900px) {
+  .player-card {
+    flex: 1 0 45%; // 2 Karten pro Reihe
+  }
+}
+
+@media (max-width: 600px) {
+  .player-card {
+    flex: 1 0 90%; // 1 Karte pro Reihe
+  }
+}

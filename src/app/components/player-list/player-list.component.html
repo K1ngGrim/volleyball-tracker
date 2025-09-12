@@ -1,0 +1,58 @@
+<div class="player-list-container">
+  <div class="player-list-header d-flex justify-content-between align-items-center mb-2">
+    <h5>Spieler</h5>
+    <button mat-stroked-button color="primary" (click)="openAddPlayerDialog()">
+      Spieler hinzufügen
+    </button>
+  </div>
+
+  <div class="player-list-grid" cdkScrollable>
+    <div cdkDropList
+         cdkDropListHasAnchor
+         cdkDropListSortingDisabled
+         class="d-flex flex-wrap gap-2"
+         [cdkDropListData]="gameService.players"
+    >
+      @for (player of gameService.players(); track player.number) {
+
+        <mat-card
+          class="player-card p-2 position-relative"
+          [ngClass]="{'libero': player.isLibero}"
+          cdkDrag
+          [cdkDragData]="player"
+        >
+
+          <div *cdkDragPreview>
+            <div class="d-flex mx-4 preview-box">
+              <span>{{player.number}}</span>
+            </div>
+          </div>
+
+          <mat-card-content class="d-flex flex-column">
+            <div class="d-flex align-items-center mb-1 justify-content-between">
+              <div class="d-flex align-items-center">
+                <div class="player-number me-2">{{ player.number }}</div>
+                <div class="player-name">{{ player.name }}</div>
+              </div>
+
+              <button mat-icon-button color="warn" (click)="gameService.removePlayer(player.number)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+
+            <div class="player-stats d-flex justify-content-between flex-wrap">
+              @if (gameService.playerStats().get(player.number); as stats) {
+                <div>H: {{ stats?.hits ?? 0 }}</div>
+                <div>K: {{ stats?.kills ?? 0 }}</div>
+                <div>E: {{ stats?.attackErrors ?? 0 }}</div>
+                <div>B: {{ stats?.blocks ?? 0 }}</div>
+                <div>S: {{ stats?.serveErrors ?? 0 }}</div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      }
+    </div>
+  </div>
+</div>

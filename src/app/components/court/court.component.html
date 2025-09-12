@@ -1,0 +1,59 @@
+<div class="court">
+  <div class="court-grid position-relative">
+    @if (gameService.gameState(); as state) {
+      @for (pos of positions; track pos;) {
+        <div
+          class="court-cell"
+          cdkDropList
+          [cdkDropListData]="state.rotation[pos-1]"
+          [cdkDropListConnectedTo]="['playerList']"
+          (cdkDropListDropped)="onDrop($event, pos-1)"
+
+        >
+
+          <div class="d-flex w-100 h-100 position-relative">
+            <div class="d-flex w-100 h-100">
+              @if (state.rotation[pos-1]; as player) {
+                @if (player) {
+                  <div class="justify-content-center d-flex align-items-center align-content-center w-25 h-100 player-slot" cdkDrag cdkDragDisabled [ngClass]="{'libero': player.isLibero}">
+                    <div class="placeholder" *cdkDragPlaceholder></div>
+                    <span style="height: fit-content; width: fit-content;">{{ player.number }}</span>
+                  </div>
+
+                  @if (gameService.started()) {
+                    <div class="stats-buttons d-flex flex-wrap justify-content-center gap-1 align-content-around p-3">
+                      <button mat-mini-fab color="primary" (click)="track('hit', player)">H</button>
+                      <button mat-mini-fab color="accent" (click)="track('kill', player)">K</button>
+                      <button mat-mini-fab color="warn" (click)="track('attackError', player)">E</button>
+
+                      @if (isFrontRow(pos-1)) {
+                        <button mat-mini-fab color="primary" (click)="track('block', player)">B</button>
+                      }
+                    </div>
+                  }
+                }
+              }
+
+              <span class="position-absolute" style="left: 0; bottom: 0; color: lightgray">{{ pos }}</span>
+            </div>
+
+          </div>
+        </div>
+      }
+      @if (state.currentServer === 'home') {
+        <div class="serve position-absolute" style="left: -32px; bottom: -32px;">
+          <img src="serve.webp" height="64" alt=""/>
+        </div>
+        @if (state.rotation[0] && gameService.started()) {
+          <div class="position-absolute" style="bottom: -4rem; ">
+            <div class="d-flex flex-row gap-2">
+              <button mat-fab color="primary" (click)="track('ace', state.rotation[0]!)">Ace</button>
+              <button mat-fab color="warn" (click)="track('serveError', state.rotation[0]!)">Serve Error</button>
+            </div>
+          </div>
+        }
+      }
+    }
+  </div>
+  <div class="net"></div>
+</div>
