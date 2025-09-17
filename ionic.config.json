@@ -1,0 +1,6 @@
+{
+  "name": "Volleyball Tracker",
+  "app_id": "de.kinggrim.vbtracker",
+  "type": "angular-standalone",
+  "integrations": {}
+}

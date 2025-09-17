@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Volleyball Tracker</string>
+    <string name="title_activity_main">Volleyball Tracker</string>
+    <string name="package_name">de.kinggrim.vbtracker</string>
+    <string name="custom_url_scheme">de.kinggrim.vbtracker</string>
+</resources>
