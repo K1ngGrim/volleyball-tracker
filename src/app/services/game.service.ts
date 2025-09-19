@@ -1,19 +1,12 @@
 import {computed, effect, Injectable, signal} from '@angular/core';
-import {Player} from '../components/player-list/player-list.component';
 import {downloadCsv, getOrCreate, isFrontRow, teamHasWonSet} from '../helper/Helper';
 import {Actions} from '../components/court/court.component';
+import {Player} from '../models/player';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
-
-  public readonly players = signal<Player[]>([{
-    name: 'test',
-    number: 1,
-    isLibero: false
-  }]);
-  public readonly addPlayerDialogOpen = signal(false);
 
   public readonly correctModeActive = signal(false);
 
@@ -31,15 +24,15 @@ export class GameService {
 
   public readonly currentServer = computed(() => {
     return this.gameState().currentServer;
-  })
+  });
 
   private readonly currentSet = computed(() => {
     return this.gameState().currentSet;
-  })
+  });
 
   private readonly currentRotation = computed(() => {
     return this.gameState().rotation || [];
-  })
+  });
 
   public readonly history = signal<Action[]>([]);
 
@@ -54,15 +47,6 @@ export class GameService {
   public readonly notStarted = computed(() => this.matchStatus() === 'notStarted');
 
   constructor() {
-    const saved = localStorage.getItem('players');
-    if (saved) {
-      this.players.set(JSON.parse(saved));
-    }
-
-    effect(() => {
-      const current = this.players();
-      localStorage.setItem('players', JSON.stringify(current));
-    });
   }
 
   public recordPlayerAction(action: Actions, player: Player) {
@@ -241,7 +225,7 @@ export class GameService {
         if(oldPlayer) {
           if(oldPlayer.isLibero) return;
 
-          player.liberoChangedFor = oldPlayer;
+          // player.liberoChangedFor = oldPlayer;
 
           current[position] = player;
           this.gameState.update(x => {
@@ -257,48 +241,48 @@ export class GameService {
 
         if(oldPlayer) {
 
-          if(oldPlayer.PlayerChangedFor) {
-            if(player.number !== oldPlayer.PlayerChangedFor.number) {
-              alert("This position can only be changed back to the original player. Player " + oldPlayer.PlayerChangedFor.number);
-            }else {
-              current[position] = oldPlayer.PlayerChangedFor;
-              oldPlayer.PlayerChangedFor = undefined;
-              this.gameState.update(x => {
-                return {
-                  ...x,
-                  rotation: current
-                };
-              });
-            }
-          }else {
-            if (oldPlayer.isLibero) {
-              if(oldPlayer.liberoChangedFor) {
-                if(oldPlayer.liberoChangedFor.number !== player.number) {
-                  alert("This position can only be changed back to the original player. Player " + oldPlayer.liberoChangedFor.number);
-                  return;
-                }else {
-                  current[position] = oldPlayer.liberoChangedFor;
-                  oldPlayer.liberoChangedFor = undefined;
-                  this.gameState.update(x => {
-                    return {
-                      ...x,
-                      rotation: current
-                    };
-                  });
-                }
-
-              }
-            }else {
-              player.PlayerChangedFor = oldPlayer;
-              current[position] = player;
-              this.gameState.update(x => {
-                return {
-                  ...x,
-                  rotation: current
-                };
-              });
-            }
-          }
+          // if(oldPlayer.PlayerChangedFor) {
+          //   if(player.number !== oldPlayer.PlayerChangedFor.number) {
+          //     alert("This position can only be changed back to the original player. Player " + oldPlayer.PlayerChangedFor.number);
+          //   }else {
+          //     current[position] = oldPlayer.PlayerChangedFor;
+          //     oldPlayer.PlayerChangedFor = undefined;
+          //     this.gameState.update(x => {
+          //       return {
+          //         ...x,
+          //         rotation: current
+          //       };
+          //     });
+          //   }
+          // }else {
+          //   if (oldPlayer.isLibero) {
+          //     if(oldPlayer.liberoChangedFor) {
+          //       if(oldPlayer.liberoChangedFor.number !== player.number) {
+          //         alert("This position can only be changed back to the original player. Player " + oldPlayer.liberoChangedFor.number);
+          //         return;
+          //       }else {
+          //         current[position] = oldPlayer.liberoChangedFor;
+          //         oldPlayer.liberoChangedFor = undefined;
+          //         this.gameState.update(x => {
+          //           return {
+          //             ...x,
+          //             rotation: current
+          //           };
+          //         });
+          //       }
+          //
+          //     }
+          //   }else {
+          //     player.PlayerChangedFor = oldPlayer;
+          //     current[position] = player;
+          //     this.gameState.update(x => {
+          //       return {
+          //         ...x,
+          //         rotation: current
+          //       };
+          //     });
+          //   }
+          // }
         }
         this.history.update(x => {
           return [...x, {
@@ -364,16 +348,16 @@ export class GameService {
     current = [...current, first];
 
     const liberoIndex = current.findIndex(p => p?.isLibero);
-    if(liberoIndex !== -1) {
-      const libero = current[liberoIndex]!;
-      if(libero.liberoChangedFor) {
-        if(isFrontRow(liberoIndex)) {
-          current[liberoIndex] = libero.liberoChangedFor;
-          libero.liberoChangedFor = undefined;
-          alert('Libero ' + libero.number + ' was exchanged for Player ' + current[liberoIndex]?.number);
-        }
-      }
-    }
+    // if(liberoIndex !== -1) {
+    //   const libero = current[liberoIndex]!;
+    //   if(libero.liberoChangedFor) {
+    //     if(isFrontRow(liberoIndex)) {
+    //       current[liberoIndex] = libero.liberoChangedFor;
+    //       libero.liberoChangedFor = undefined;
+    //       alert('Libero ' + libero.number + ' was exchanged for Player ' + current[liberoIndex]?.number);
+    //     }
+    //   }
+    // }
 
     this.gameState.update(x => {
       return {
@@ -381,18 +365,6 @@ export class GameService {
         rotation: current,
         currentServer: 'home'
       };
-    });
-  }
-
-  public addPlayer(player: Player) {
-    this.players.set([...this.players(), player]);
-  }
-
-  public removePlayer(playerNumber: number) {
-    this.players.set(this.players().filter(p => p.number !== playerNumber));
-    this.playerStats.update(map => {
-      map.delete(playerNumber);
-      return map;
     });
   }
 

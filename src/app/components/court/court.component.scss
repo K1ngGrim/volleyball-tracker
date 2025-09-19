@@ -10,31 +10,30 @@
   width: 100%;
   max-width: 400px;
   aspect-ratio: 2 / 1;
-  background: #f3f3f3;
-  border: 2px solid #444;
+  background: rgb(193, 118, 23);
+  border: 2px solid white;
   display: flex;
 }
 
 .court-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   flex: 1;
 }
 
 .court-cell {
-  border: 1px solid #999;
+  border: 0.5px solid white;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.2rem;
   font-weight: bold;
   min-height: 80px;
-}
 
-.placeholder {
-  opacity: 0.3;
-  border: 1px dashed #ccc;
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
 
 .player-slot {
@@ -46,10 +45,7 @@
 }
 
 .net {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 6px;
-  height: 100%;
-  background: black;
+  background-color: white;
+  color: black;
+  font-size: 0.75rem;
 }

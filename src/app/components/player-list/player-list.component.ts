@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, inject} from '@angular/core';
+import {ChangeDetectorRef, Component, inject, signal} from '@angular/core';
 import {MatCard, MatCardContent} from '@angular/material/card';
 import {NgClass} from '@angular/common';
 import {CdkDrag, CdkDragPreview, CdkDropList} from '@angular/cdk/drag-drop';
@@ -6,8 +6,11 @@ import {MatButton, MatIconButton} from '@angular/material/button';
 import {GameService} from '../../services/game.service';
 import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
-import {PlayerDialogComponent} from '../player-dialog/player-dialog.component';
 import {CdkScrollable} from '@angular/cdk/scrolling';
+import {PlayerService} from '../../services/player.service';
+import {MatCheckbox} from '@angular/material/checkbox';
+import {Player} from '../../models/player';
+import {IonIcon} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-player-list',
@@ -21,33 +24,32 @@ import {CdkScrollable} from '@angular/cdk/scrolling';
     CdkDragPreview,
     MatIcon,
     MatIconButton,
-    CdkScrollable
+    CdkScrollable,
+    MatCheckbox,
+    IonIcon
   ],
   templateUrl: './player-list.component.html',
   styleUrl: './player-list.component.scss'
 })
 export class PlayerListComponent {
-  protected gameService = inject(GameService);
-  private dialog = inject(MatDialog);
-  private cdr = inject(ChangeDetectorRef);
 
-  public openAddPlayerDialog() {
-    const s = this.dialog.open(PlayerDialogComponent, {
-      width: '300px',
-    });
+  protected readonly gameService = inject(GameService);
+  private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
+  protected readonly playerService = inject(PlayerService);
 
-    s.afterClosed().subscribe(result => {
-      this.cdr.detectChanges();
-    });
+  public readonly playerListOpened = signal<boolean>(false);
 
+  public playerSelected(player: Player) {
+    return this.playerService.selectedPlayer() === player;
   }
 
-}
+  public togglePlayerList() {
+    this.playerListOpened.set(!this.playerListOpened());
+  }
 
-export interface Player {
-  number: number;
-  name: string;
-  isLibero?: boolean;
-  liberoChangedFor?: Player;
-  PlayerChangedFor?: Player;
+  public selectPlayer(player: Player) {
+    this.playerService.selectedPlayer.set(player);
+    this.cdr.detectChanges();
+  }
 }

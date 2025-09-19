@@ -1,10 +1,11 @@
 import {Component, inject} from '@angular/core';
 import {CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList} from '@angular/cdk/drag-drop';
 import {NgClass} from '@angular/common';
-import {Player} from '../player-list/player-list.component';
 import {GameService} from '../../services/game.service';
 import {MatFabButton, MatMiniFabButton} from '@angular/material/button';
 import {isFrontRow} from '../../helper/Helper';
+import {Player} from '../../models/player';
+import {PlayerService} from '../../services/player.service';
 
 @Component({
   selector: 'app-court',
@@ -20,12 +21,16 @@ import {isFrontRow} from '../../helper/Helper';
   styleUrl: './court.component.scss'
 })
 export class CourtComponent {
-  positions = [5, 4, 6, 3, 1, 2];
+  positions = [4, 3, 2, 5, 6, 1];
 
   protected readonly gameService = inject(GameService);
+  protected readonly playerService = inject(PlayerService);
 
-  public onDrop(event: CdkDragDrop<any>, posIndex: number) {
-    this.gameService.setPlayer(event.item.data, posIndex);
+  public clickCourtCell(posIndex: number) {
+    if (!this.playerService.selectedPlayer()) {
+      return;
+    }
+    this.gameService.setPlayer(this.playerService.selectedPlayer()!, posIndex-1);
   }
 
   public track(action: Actions, player: Player) {

@@ -5,10 +5,14 @@ import {CdkDropListGroup} from '@angular/cdk/drag-drop';
 import {ScoreboardComponent} from './components/scoreboard/scoreboard.component';
 import {GameService} from './services/game.service';
 import {JsonPipe} from '@angular/common';
+import {IonApp, IonIcon, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { library, playCircle, radio, search, add, chevronUp } from 'ionicons/icons';
+import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
-  imports: [PlayerListComponent, CourtComponent, CdkDropListGroup, ScoreboardComponent, JsonPipe],
+  imports: [PlayerListComponent, CourtComponent, CdkDropListGroup, ScoreboardComponent, JsonPipe, IonTabs, IonTabBar, IonTabButton, IonIcon, IonRouterOutlet, IonApp],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -25,6 +29,7 @@ export class App implements OnDestroy {
 
   constructor() {
     //this.enable();
+    addIcons({ library, playCircle, radio, search, add, chevronUp});
   }
 
   ngOnDestroy() {

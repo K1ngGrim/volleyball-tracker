@@ -1,15 +1,15 @@
-<div class="scoreboard d-flex flex-column align-items-center p-3 w-100">
-  <div class="d-flex flex-row w-100 gap-3 mb-5 align-items-center">
+<div class="scoreboard d-flex flex-column align-items-center px-3 w-100">
+<!--  <div class="d-flex flex-row w-100 gap-3 mb-5 align-items-center">-->
 
-    <div class="d-flex">
-      <mat-slide-toggle color="warn" [(ngModel)]="gameService.correctModeActive">Korrektur-Modus</mat-slide-toggle>
-    </div>
-    <button mat-stroked-button color="accent" (click)="gameService.exportPreviousSetsCsv()">Spielhistorie exportieren</button>
-    <button mat-stroked-button color="accent" (click)="gameService.exportPlayerStatsCsv()">Statistiken exportieren</button>
+<!--    <div class="d-flex">-->
+<!--      <mat-slide-toggle color="warn" [(ngModel)]="gameService.correctModeActive">Korrektur-Modus</mat-slide-toggle>-->
+<!--    </div>-->
+<!--    <button mat-stroked-button color="accent" (click)="gameService.exportPreviousSetsCsv()">Spielhistorie exportieren</button>-->
+<!--    <button mat-stroked-button color="accent" (click)="gameService.exportPlayerStatsCsv()">Statistiken exportieren</button>-->
 
-    <button mat-stroked-button [color]="'warn'" class="ms-auto" (click)="gameService.reset()">Zurücksetzen</button>
+<!--    <button mat-stroked-button [color]="'warn'" class="ms-auto" (click)="gameService.reset()">Zurücksetzen</button>-->
 
-  </div>
+<!--  </div>-->
   @if (gameService.gameState(); as state) {
     <div class="d-flex justify-content-center align-items-center w-100 mb-2">
       <!-- Home -->
@@ -52,18 +52,23 @@
   }
 
   <!-- Control Buttons -->
-  <div class="d-flex justify-content-center mt-2 gap-2">
-    <button mat-stroked-button color="primary" [disabled]="gameService.started()" (click)="gameService.startMatch()">
-      @if (gameService.paused() || gameService.started()) {
-        Fortsetzen
-      } @else {
-        Start
-      }
-    </button>
-    <button mat-stroked-button color="accent" [disabled]="!gameService.started()" (click)="gameService.pauseMatch()">Pause</button>
+  <div class="d-flex justify-content-center mt-2 gap-2 w-100">
+    @if (gameService.notStarted() || gameService.paused()) {
+      <button mat-stroked-button color="primary" [disabled]="gameService.started()" (click)="gameService.startMatch()">
+        @if (gameService.paused() || gameService.started()) {
+          Fortsetzen
+        } @else {
+          Start
+        }
+      </button>
+    } @else if (gameService.started()) {
+      <button mat-stroked-button color="accent" [disabled]="!gameService.started()" (click)="gameService.pauseMatch()">Pause</button>
+    }
+
+
     <button mat-stroked-button color="warn" [disabled]="!gameService.started()" (click)="gameService.stopMatch()">Stop</button>
     <button mat-stroked-button color="secondary" (click)="undo()" [disabled]="!hasHistory() || !gameService.started()">
-      <mat-icon>undo</mat-icon> Rückgängig
+      <mat-icon>undo</mat-icon>
     </button>
     @if (!gameService.started()) {
       <button mat-stroked-button color="primary" (click)="gameService.changeServingTeam()" [disabled]="gameService.started()">
