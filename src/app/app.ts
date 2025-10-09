@@ -1,18 +1,13 @@
 import {Component, inject, OnDestroy, signal} from '@angular/core';
-import {PlayerListComponent} from './components/player-list/player-list.component';
-import {CourtComponent} from './components/court/court.component';
-import {CdkDropListGroup} from '@angular/cdk/drag-drop';
-import {ScoreboardComponent} from './components/scoreboard/scoreboard.component';
 import {GameService} from './services/game.service';
-import {JsonPipe} from '@angular/common';
-import {IonApp, IonIcon, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { library, playCircle, radio, search, add, chevronUp } from 'ionicons/icons';
-import {DomSanitizer} from '@angular/platform-browser';
+import {IonApp, IonRouterOutlet} from '@ionic/angular/standalone';
+import {addIcons} from 'ionicons';
+import {add, chevronUp, library, playCircle, radio, search} from 'ionicons/icons';
+import {ActivationStart, Router} from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [PlayerListComponent, CourtComponent, CdkDropListGroup, ScoreboardComponent, JsonPipe, IonTabs, IonTabBar, IonTabButton, IonIcon, IonRouterOutlet, IonApp],
+  imports: [IonRouterOutlet, IonApp],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -27,8 +22,13 @@ export class App implements OnDestroy {
     return '';
   };
 
-  constructor() {
-    //this.enable();
+  constructor(private router: Router) {
+    this.router.events.subscribe(e => {
+      if (e instanceof ActivationStart) {
+        console.warn('ACTIVATION for outlet:', e.snapshot.outlet, 'route:', e.snapshot.routeConfig?.path);
+      }
+    });
+
     addIcons({ library, playCircle, radio, search, add, chevronUp});
   }
 

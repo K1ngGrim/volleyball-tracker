@@ -1,20 +1,20 @@
 import {Component, inject, OnInit, signal, viewChild} from '@angular/core';
 import {
-  IonButton, IonButtons,
   IonContent,
   IonFab,
-  IonFabButton, IonHeader,
-  IonIcon, IonInput,
-  IonItem, IonItemOption, IonItemOptions,
+  IonFabButton,
+  IonIcon,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
   IonItemSliding,
   IonLabel,
-  IonList, IonModal, IonSelect, IonSelectOption, IonTitle, IonToolbar
+  IonList
 } from '@ionic/angular/standalone';
 import {PlayerService} from '../../../services/player.service';
 import {PlayerPostionShortPipe} from '../../../pipes/player-postion-short-pipe';
-import {Player, PlayerPosition} from '../../../models/player';
+import {Player} from '../../../models/player';
 import {FormsModule} from '@angular/forms';
-import {KeyValuePipe} from '@angular/common';
 import {PlayerModalComponent} from '../../player-modal/player-modal.component';
 
 @Component({

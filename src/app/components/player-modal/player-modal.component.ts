@@ -1,16 +1,18 @@
-import {Component, effect, inject, input, model, OnInit, output, signal, viewChild} from '@angular/core';
+import {Component, effect, inject, input, OnInit, output, signal, viewChild} from '@angular/core';
 import {Player, PlayerPosition} from '../../models/player';
 import {
   IonButton,
   IonButtons,
-  IonContent, IonFabButton,
+  IonContent,
   IonHeader,
   IonInput,
   IonItem,
   IonModal,
-  IonSelect, IonSelectOption, IonTitle, IonToolbar
+  IonSelect,
+  IonSelectOption,
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
-import {KeyValuePipe} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {PlayerService} from '../../services/player.service';
 
@@ -30,7 +32,6 @@ import {PlayerService} from '../../services/player.service';
     IonSelectOption,
     IonTitle,
     IonToolbar,
-    KeyValuePipe,
     FormsModule
   ]
 })

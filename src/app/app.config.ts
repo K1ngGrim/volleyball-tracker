@@ -2,7 +2,7 @@ import {ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChange
 import {provideRouter} from '@angular/router';
 
 import {routes} from './app.routes';
-import { provideIonicAngular } from '@ionic/angular/standalone';
+import {provideIonicAngular} from '@ionic/angular/standalone';
 
 export const appConfig: ApplicationConfig = {
   providers: [

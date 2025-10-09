@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {IonicModule} from '@ionic/angular';
 
-import { TabsPageComponent } from './tabs-page.component';
+import {TabsPageComponent} from './tabs-page.component';
 
 describe('TabsPageComponent', () => {
   let component: TabsPageComponent;

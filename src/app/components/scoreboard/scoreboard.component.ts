@@ -2,7 +2,6 @@ import {Component, inject} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {GameService} from '../../services/game.service';
-import {MatSlideToggle} from '@angular/material/slide-toggle';
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -10,7 +9,6 @@ import {FormsModule} from '@angular/forms';
   imports: [
     MatButton,
     MatIcon,
-    MatSlideToggle,
     FormsModule,
   ],
   templateUrl: './scoreboard.component.html',

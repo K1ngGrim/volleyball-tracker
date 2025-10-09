@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {IonicModule} from '@ionic/angular';
 
-import { HistoryPageTabComponent } from './history-page-tab.component';
+import {HistoryPageTabComponent} from './history-page-tab.component';
 
 describe('HistoryPageTabComponent', () => {
   let component: HistoryPageTabComponent;

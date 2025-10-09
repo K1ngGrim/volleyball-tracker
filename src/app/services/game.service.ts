@@ -1,4 +1,4 @@
-import {computed, effect, Injectable, signal} from '@angular/core';
+import {computed, Injectable, signal} from '@angular/core';
 import {downloadCsv, getOrCreate, isFrontRow, teamHasWonSet} from '../helper/Helper';
 import {Actions} from '../components/court/court.component';
 import {Player} from '../models/player';
