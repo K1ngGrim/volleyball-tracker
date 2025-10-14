@@ -14,6 +14,7 @@ export class PlayerService {
       name: 'Player 1',
       number: 1,
       position: PlayerPosition.OppositeHitter
+
     },
     {
       name: 'Player 2',
@@ -27,32 +28,32 @@ export class PlayerService {
     },
     {
       name: 'Player 1',
-      number: 1,
+      number: 4,
       position: PlayerPosition.OppositeHitter
     },
     {
       name: 'Player 2',
-      number: 2,
+      number: 5,
       position: PlayerPosition.Libero
     },
     {
       name: 'Player 3',
-      number: 3,
+      number: 6,
       position: PlayerPosition.MiddleBlocker
     },
     {
       name: 'Player 1',
-      number: 1,
+      number: 7,
       position: PlayerPosition.OppositeHitter
     },
     {
       name: 'Player 2',
-      number: 2,
+      number: 8,
       position: PlayerPosition.Libero
     },
     {
       name: 'Player 3',
-      number: 3,
+      number: 9,
       position: PlayerPosition.MiddleBlocker
     }
   ]);

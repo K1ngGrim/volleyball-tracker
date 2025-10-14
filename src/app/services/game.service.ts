@@ -8,9 +8,8 @@ import {Player} from '../models/player';
 })
 export class GameService {
 
-  public readonly correctModeActive = signal(false);
+  //refactored GameService
 
-  public readonly previousSets = signal<(Action[])[]>([]);
   public readonly playerStats = signal<Map<number, PlayerStats>>(new Map());
   public readonly gameState = signal<ScoreboardState>({
     homeScore: 0,
@@ -21,6 +20,24 @@ export class GameService {
     awaySetsWon: 0,
     rotation: Array(6).fill(null)
   });
+
+  public readonly redoStack = signal<ScoreboardState[]>([]);
+
+  // History of completed sets (each entry is a full copy of the sets full history)
+  private readonly previousSets = signal<ScoreboardState[][]>([]);
+
+  // History of completed sets (each entry is a full copy of the game state at the end of the set)
+  public readonly setHistory = signal<ScoreboardState[]>([]);
+  public readonly correctModeActive = signal(false);
+
+  public readonly matchTime = signal(0);
+  private timerInterval: any = null;
+
+  private readonly matchStatus = signal<'notStarted' | 'inProgress' | 'paused' | 'ended'>('notStarted');
+
+  public readonly started = computed(() => this.matchStatus() === 'inProgress');
+  public readonly paused = computed(() => this.matchStatus() === 'paused');
+  public readonly notStarted = computed(() => this.matchStatus() === 'notStarted');
 
   public readonly currentServer = computed(() => {
     return this.gameState().currentServer;
@@ -34,159 +51,130 @@ export class GameService {
     return this.gameState().rotation || [];
   });
 
-  public readonly history = signal<Action[]>([]);
-
-  public readonly matchTime = signal(0);
-  private timerInterval: any = null;
-
-  private readonly matchStatus = signal<'notStarted' | 'inProgress' | 'paused' | 'ended'>('notStarted');
-
-  public readonly hasHistory = computed(() => this.history().length > 1);
-  public readonly started = computed(() => this.matchStatus() === 'inProgress');
-  public readonly paused = computed(() => this.matchStatus() === 'paused');
-  public readonly notStarted = computed(() => this.matchStatus() === 'notStarted');
-
-  constructor() {
-  }
-
-  public recordPlayerAction(action: Actions, player: Player) {
-
-    let summand = 1
-
-    if(this.correctModeActive()) {
-      summand = -1;
-    }
-
-    const statsMap = this.playerStats();
-    let stats = getOrCreate(statsMap, player.number, () => ({
-        playerNumber: player.number,
-        playerName: player.name,
-        hits: 0,
-        kills: 0,
-        attackErrors: 0,
-        blocks: 0,
-        aces: 0,
-        serveErrors: 0
-      }));
-
-    switch(action) {
-      case 'hit':
-        stats.hits+=summand;
-        break;
-      case 'kill':
-        stats.kills+=summand;
-        break;
-      case 'attackError':
-        stats.attackErrors+=summand;
-        break;
-      case 'block':
-        stats.blocks+=summand;
-        break;
-      case 'serveError':
-        stats.serveErrors+=summand;
-        break;
-      case 'ace':
-        stats.aces+=summand;
-        break;
-    }
-
-    if(!this.correctModeActive()) {
-      if(action === 'ace' || action === 'kill') {
-        this.addPoint('home');
-        return;
-      }
-
-      if (action === 'attackError' || action === 'serveError') {
-        this.addPoint('away');
-        return;
-      }
-    }
-
-    this.playerStats.update(x => {
-      x.set(player.number, stats);
-      return x;
-    });
-
-  }
-
-  public changeServingTeam() {
+  public startMatch() {
     if (this.started()) return;
-    const newServer = this.currentServer() === 'home' ? 'away' : 'home';
-    this.gameState.update(x => {
-      return {
-        ...x,
-        currentServer: newServer
-      };
-    });
+    if(this.gameState().rotation.find(x => x === null) !== undefined) {
+      alert('Please set all player positions before starting the match.');
+      return;
+    }
+    this.matchStatus.set('inProgress');
+    this.timerInterval = setInterval(() => {
+      this.matchTime.update(t => t + 1);
+    }, 1000);
   }
 
-  public addPoint(team: 'home' | 'away') {
+  public pauseMatch() {
     if (!this.started()) return;
-    if (team === 'home') {
-      const shouldRotate = this.currentServer() !== 'home';
+    this.matchStatus.set('paused');
+    if (this.timerInterval) clearInterval(this.timerInterval);
+  }
 
-      this.gameState.update(x => {
-        return {
-          ...x,
-          homeScore: x.homeScore + 1,
-          currentServer: team
-        };
+  public stopMatch() {
+    this.matchStatus.set('notStarted');
+    if (this.timerInterval) clearInterval(this.timerInterval);
+
+    this.matchTime.set(0);
+  }
+
+
+  public updateSetPoints(team: 'home' | 'away', correctionMode: -1 | 1 | null = null) {
+    let state = this.gameState();
+    if (this.started()) {
+      //current state (as a reference)
+
+      this.setHistory.update(x => {
+        return [...x, structuredClone(this.gameState())];
       });
 
-      if(shouldRotate) {
-        this.rotate();
+      this.redoStack.set([]);
+
+      const hasToRotate = state.currentServer !== team;
+
+      state = {
+        ...state,
+        homeScore: team == 'home' ? state.homeScore + 1 : state.homeScore,
+        awayScore: team == 'away' ? state.awayScore + 1 : state.awayScore,
+        currentServer: team
       }
 
-    } else {
-     this.gameState.update(x => {
-        return {
-          ...x,
-          awayScore: x.awayScore + 1,
-          currentServer: team
-        };
-      });
-    }
+      const pointDifference = state.homeScore - state.awayScore;
 
-    const oldHistory = this.history();
-    this.history.set([...oldHistory, {
-      type: 'point',
-      team: team,
-      state: this.gameState(),
-      timestamp: this.formattedTime()
-    }]);
+      if (Math.abs(pointDifference) >= 2 && (state.homeScore >= 25 || state.awayScore >= 25)) {
+        // Set is won
+        const homeWon = pointDifference > 0;
 
-    const state = this.gameState();
+        const lastServer = this.setHistory()[0].currentServer
 
-     const homeWon = teamHasWonSet(state.homeScore, state.awayScore);
-     const awayWon = teamHasWonSet(state.awayScore, state.homeScore);
-
-     if (homeWon || awayWon) {
-       const lastServer = this.history()[0].state.currentServer
-
-       const initState = {
+        const initState = {
           homeScore: 0,
           awayScore: 0,
           currentServer: lastServer === 'home' ? "away" : "home",
           currentSet: this.currentSet() + 1,
           homeSetsWon: homeWon ? state.homeSetsWon + 1 : state.homeSetsWon,
-          awaySetsWon: awayWon ? state.awaySetsWon + 1 : state.awaySetsWon,
+          awaySetsWon: !homeWon ? state.awaySetsWon + 1 : state.awaySetsWon,
           rotation: Array(6).fill(null)
-       } as ScoreboardState;
+        } as ScoreboardState;
 
-       this.previousSets.update(x => [...x, this.history()]);
-       this.stopMatch();
+        this.previousSets.update(x => [...x, structuredClone(this.setHistory())]);
+        this.stopMatch();
 
-       this.gameState.set(initState);
-     }
+        this.gameState.set(initState);
+
+
+      }
+    }else if (this.correctModeActive() && correctionMode) {
+      state = {
+        ...state,
+        homeScore: team == 'home' ? state.homeScore + correctionMode : state.homeScore,
+        awayScore: team == 'away' ? state.awayScore + correctionMode : state.awayScore,
+      }
+    }
+  }
+
+  /**
+   * Updates the serving team by toggling between 'home' and 'away'.
+   * This function only works if the match has started or the correct mode is active.
+   */
+  public updateServingTeam() {
+    if (this.started() && !this.correctModeActive()) return;
+
+    this.gameState.update(x => {
+      return {
+        ...x,
+        currentServer: x.currentServer === 'home' ? 'away' : 'home'
+      }
+    });
   }
 
   public undo() {
     if (!this.started()) return;
-    this.history().pop();
-    if (this.history().length > 1) {
-      const lastAction = this.history()[this.history().length - 1];
-      if (lastAction.state)
-        this.gameState.set(lastAction.state);
+
+    if (this.setHistory().length > 1) {
+      const state = structuredClone(this.gameState());
+      this.redoStack.update(x => {
+        return [...x, state];
+      });
+      const latest = this.setHistory().pop();
+
+      if (!latest) return;
+
+      this.gameState.set(latest);
+    }
+  }
+
+  public redo() {
+    if (!this.started()) return;
+
+    if (this.redoStack().length > 0) {
+      const state = structuredClone(this.gameState());
+      this.setHistory.update(x => {
+        return [...x, state];
+      });
+
+      const newState = this.redoStack().pop();
+      if (!newState) return;
+
+      this.gameState.set(newState);
     }
   }
 
@@ -284,51 +272,99 @@ export class GameService {
           //   }
           // }
         }
-        this.history.update(x => {
-          return [...x, {
-            type: 'playerChange',
-            team: 'home',
-            state: this.gameState(),
-            timestamp: this.formattedTime()
-          }];
-        });
       }
     }
   }
 
-  public startMatch() {
-    if (this.started()) return;
-    if(this.gameState().rotation.find(x => x === null) !== undefined) {
-      alert('Please set all player positions before starting the match.');
-      return;
-    }
-    if (!this.paused()) {
-      this.history.set([
-        {
-          type: 'init',
-          state: this.gameState(),
-          team: null,
-        }
-      ]);
-    }
-    this.matchStatus.set('inProgress');
-    this.timerInterval = setInterval(() => {
-      this.matchTime.update(t => t + 1);
-    }, 1000);
+
+  private rotate() {
+    const state = this.gameState();
+    if (!state.rotation || state.rotation.length === 0) return;
+
+    let current = [...state.rotation];
+    const first = current.shift()!;
+    let newRotation = [...current, first];
+
+    const liberoIndex = newRotation.findIndex(p => p?.isLibero);
+    if(liberoIndex !== -1) {
+      const libero = newRotation[liberoIndex]!;
+      if(libero.playerChangedFor) {
+        if(isFrontRow(liberoIndex)) {
+          newRotation[liberoIndex] = libero.playerChangedFor;
+          libero.playerChangedFor = undefined;
+          alert('Libero ' + libero.number + ' was exchanged for Player ' + newRotation[liberoIndex]?.number);
+       }
+      }
+   }
+
+    this.gameState.update(x => {
+      return {
+        ...x,
+        rotation: newRotation
+      }
+    });
   }
 
-  public pauseMatch() {
-    if (!this.started()) return;
-    this.matchStatus.set('paused');
-    if (this.timerInterval) clearInterval(this.timerInterval);
+
+
+
+
+
+
+
+
+
+
+  //Old Code
+  constructor() {
   }
 
-  public stopMatch() {
-    this.matchStatus.set('notStarted');
-    if (this.timerInterval) clearInterval(this.timerInterval);
-    this.history.set([]);
+  public recordPlayerAction(action: Actions, player: Player) {
 
-    this.matchTime.set(0);
+    let summand = 1
+
+    if(this.correctModeActive()) {
+      summand = -1;
+    }
+
+    const statsMap = this.playerStats();
+    let stats = getOrCreate(statsMap, player.number, () => ({
+        playerNumber: player.number,
+        playerName: player.name,
+        hits: 0,
+        kills: 0,
+        attackErrors: 0,
+        blocks: 0,
+        aces: 0,
+        serveErrors: 0
+      }));
+
+    switch(action) {
+      case 'hit':
+        stats.hits+=summand;
+        break;
+      case 'kill':
+        stats.kills+=summand;
+        break;
+      case 'attackError':
+        stats.attackErrors+=summand;
+        break;
+      case 'block':
+        stats.blocks+=summand;
+        break;
+      case 'serveError':
+        stats.serveErrors+=summand;
+        break;
+      case 'ace':
+        stats.aces+=summand;
+        break;
+    }
+
+    this.playerStats.update(x => {
+      x.set(player.number, stats);
+      return x;
+    });
+
   }
 
   public formattedTime() {
@@ -338,43 +374,9 @@ export class GameService {
     return `${minutes}:${seconds}`;
   }
 
-  private rotate() {
-    const state = this.gameState();
-    if (!state.rotation || state.rotation.length === 0) return;
-
-    let current = [...state.rotation];
-
-    const first = current.shift()!;
-    current = [...current, first];
-
-    const liberoIndex = current.findIndex(p => p?.isLibero);
-    // if(liberoIndex !== -1) {
-    //   const libero = current[liberoIndex]!;
-    //   if(libero.liberoChangedFor) {
-    //     if(isFrontRow(liberoIndex)) {
-    //       current[liberoIndex] = libero.liberoChangedFor;
-    //       libero.liberoChangedFor = undefined;
-    //       alert('Libero ' + libero.number + ' was exchanged for Player ' + current[liberoIndex]?.number);
-    //     }
-    //   }
-    // }
-
-    this.gameState.update(x => {
-      return {
-        ...x,
-        rotation: current,
-        currentServer: 'home'
-      };
-    });
-  }
-
-
+/*
   public exportPreviousSetsCsv() {
     const sets = this.previousSets();
-
-    if(this.started()) {
-      sets.push(this.history())
-    }
 
     const rows: any[] = [];
 
@@ -396,6 +398,7 @@ export class GameService {
     downloadCsv('match-history.csv', rows);
   }
 
+ */
   public exportPlayerStatsCsv() {
     const statsArray = Array.from(this.playerStats().values());
 
@@ -414,7 +417,7 @@ export class GameService {
   }
 
   public reset() {
-    this.history.set([]);
+    this.setHistory.set([]);
     this.gameState.set({
       homeScore: 0,
       awayScore: 0,
