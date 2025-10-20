@@ -16,12 +16,14 @@ export class GameService {
     awayScore: 0,
     currentServer: 'home',
     currentSet: 1,
-    homeSetsWon: 0,
-    awaySetsWon: 0,
+    homeSetsWon: 1,
+    awaySetsWon: 2,
     rotation: Array(6).fill(null)
   });
 
   public readonly redoStack = signal<ScoreboardState[]>([]);
+
+  private readonly homeSiteRight = signal(false);
 
   // History of completed sets (each entry is a full copy of the sets full history)
   private readonly previousSets = signal<ScoreboardState[][]>([]);
@@ -38,6 +40,8 @@ export class GameService {
   public readonly started = computed(() => this.matchStatus() === 'inProgress');
   public readonly paused = computed(() => this.matchStatus() === 'paused');
   public readonly notStarted = computed(() => this.matchStatus() === 'notStarted');
+
+  public readonly isHomeRightSide = computed(() => this.homeSiteRight());
 
   public readonly currentServer = computed(() => {
     return this.gameState().currentServer;
@@ -74,6 +78,21 @@ export class GameService {
     if (this.timerInterval) clearInterval(this.timerInterval);
 
     this.matchTime.set(0);
+  }
+
+  public changeSides() {
+    this.homeSiteRight.update(x => !x);
+  }
+
+  public changeServiceTeam() {
+    if (this.started() && !this.correctModeActive()) return;
+
+    this.gameState.update(x => {
+      return {
+        ...x,
+        currentServer: x.currentServer === 'home' ? 'away' : 'home'
+      }
+    });
   }
 
 
@@ -129,21 +148,6 @@ export class GameService {
         awayScore: team == 'away' ? state.awayScore + correctionMode : state.awayScore,
       }
     }
-  }
-
-  /**
-   * Updates the serving team by toggling between 'home' and 'away'.
-   * This function only works if the match has started or the correct mode is active.
-   */
-  public updateServingTeam() {
-    if (this.started() && !this.correctModeActive()) return;
-
-    this.gameState.update(x => {
-      return {
-        ...x,
-        currentServer: x.currentServer === 'home' ? 'away' : 'home'
-      }
-    });
   }
 
   public undo() {
