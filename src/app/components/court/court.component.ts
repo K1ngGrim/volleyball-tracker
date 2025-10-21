@@ -3,7 +3,7 @@ import {NgClass} from '@angular/common';
 import {GameService} from '../../services/game.service';
 import {MatMiniFabButton} from '@angular/material/button';
 import {isFrontRow} from '../../helper/Helper';
-import {Player} from '../../models/player';
+import {Player, PlayerPosition} from '../../models/player';
 import {PlayerService} from '../../services/player.service';
 
 @Component({
@@ -22,6 +22,7 @@ export class CourtComponent {
   protected readonly playerService = inject(PlayerService);
 
   public clickCourtCell(posIndex: number) {
+    console.log("clickCourtCell", posIndex);
     if (!this.playerService.selectedPlayer()) {
       return;
     }
@@ -34,6 +35,7 @@ export class CourtComponent {
   }
 
   protected readonly isFrontRow = isFrontRow;
+  protected readonly PlayerPosition = PlayerPosition;
 }
 
 export type Actions = 'hit' | 'kill' | 'attackError' | 'block' | 'serveError' | 'ace';

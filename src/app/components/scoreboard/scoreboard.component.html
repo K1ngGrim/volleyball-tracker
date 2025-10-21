@@ -1,15 +1,17 @@
 <div class="scoreboard d-flex flex-column align-items-center px-3 w-100">
-<!--  <div class="d-flex flex-row w-100 gap-3 mb-5 align-items-center">-->
+  <div class="d-flex flex-row w-100 align-items-center my-2">
 
-<!--    <div class="d-flex">-->
-<!--      <mat-slide-toggle color="warn" [(ngModel)]="gameService.correctModeActive">Korrektur-Modus</mat-slide-toggle>-->
-<!--    </div>-->
-<!--    <button mat-stroked-button color="accent" (click)="gameService.exportPreviousSetsCsv()">Spielhistorie exportieren</button>-->
-<!--    <button mat-stroked-button color="accent" (click)="gameService.exportPlayerStatsCsv()">Statistiken exportieren</button>-->
+    <div class="d-flex">
+      <mat-slide-toggle color="primary" [(ngModel)]="gameService.correctModeActive">Korrektur-Modus</mat-slide-toggle>
+    </div>
+      <!--<button mat-stroked-button color="accent" (click)="gameService.exportPreviousSetsCsv()">Spielhistorie exportieren</button>-->
+    <div class="d-flex flex-row gap-2">
+      <button mat-stroked-button color="accent" (click)="gameService.exportPlayerStatsCsv()">Speichern</button>
 
-<!--    <button mat-stroked-button [color]="'warn'" class="ms-auto" (click)="gameService.reset()">Zurücksetzen</button>-->
+      <button mat-stroked-button [color]="'warn'" class="ms-auto" (click)="gameService.reset()">Zurücksetzen</button>
+    </div>
 
-<!--  </div>-->
+  </div>
   @if (gameService.gameState(); as state) {
     <div class="d-flex justify-content-between align-items-center w-100 mb-2" [ngClass]="homeSiteRight()?'flex-row-reverse':'flex-row'">
       <!-- Home -->
@@ -57,7 +59,7 @@
   }
 
   <!-- Control Buttons -->
-  <div class="d-flex justify-content-center mt-2 gap-2 w-100">
+  <div class="d-flex justify-content-center mt-2 gap-2 w-100 mb-3">
     @if (gameService.notStarted() || gameService.paused()) {
       <button mat-stroked-button color="primary" [disabled]="gameService.started()" (click)="gameService.startMatch()">
         @if (gameService.paused() || gameService.started()) {
@@ -68,13 +70,16 @@
       </button>
     } @else if (gameService.started()) {
       <button mat-stroked-button color="accent" [disabled]="!gameService.started()" (click)="gameService.pauseMatch()">Pause</button>
-      <button mat-stroked-button color="warn" [disabled]="!gameService.started()" (click)="gameService.stopMatch()">Stop</button>
-      <button mat-stroked-button color="secondary" (click)="undo()" [disabled]="!hasHistory() || !gameService.started()">
+      <button mat-stroked-button color="secondary" (click)="undo()" [disabled]="!gameService.started()">
         <mat-icon>undo</mat-icon>
       </button>
     }
 
-    @if (!gameService.started()) {
+    @if (gameService.paused()) {
+      <button mat-stroked-button color="warn" [disabled]="!gameService.started()" (click)="gameService.stopMatch()">Stop</button>
+    }
+
+    @if (!gameService.paused() && !gameService.started()) {
       <button mat-stroked-button color="primary" [disabled]="gameService.started()" (click)="changeServiceTeam()">
         <mat-icon>swap_horiz</mat-icon> Aufschlag wechseln
       </button>
@@ -83,4 +88,43 @@
       </button>
     }
   </div>
+
+  <div class="scoreboard-extension w-100 px-3 mb-2">
+    <div class="d-flex flex-column correction-panel gap-1" [ngClass]="correctionPanelExpanded() && correctionModeEnabled() ? 'opened' : 'closed'">
+      <div class="d-flex justify-content-between align-items-center w-100 mb-2" [ngClass]="homeSiteRight()?'flex-row-reverse':'flex-row'">
+        <div class="team flex-fill text-center flex-column d-flex gap-2 mx-4">
+          <button mat-stroked-button color="primary" (click)="correctPoint('home', true)">
+            <mat-icon>exposure_plus_1</mat-icon> Punkt
+          </button>
+          <button mat-stroked-button color="primary" (click)="correctPoint('home', false)">
+            <mat-icon>exposure_minus_1</mat-icon> Punkt
+          </button>
+        </div>
+        <div class="team flex-fill text-center flex-column d-flex gap-2 mx-4">
+          <button mat-stroked-button color="primary" (click)="correctPoint('away', true)">
+            <mat-icon>exposure_plus_1</mat-icon> Punkt
+          </button>
+          <button mat-stroked-button color="primary" (click)="correctPoint('away', false)">
+            <mat-icon>exposure_minus_1</mat-icon> Punkt
+          </button>
+        </div>
+      </div>
+      <div class="d-flex w-100">
+        <button mat-stroked-button color="primary" (click)="correctRotation()">
+          <mat-icon>rotate_right</mat-icon> Rotate
+        </button>
+      </div>
+    </div>
+
+    @if (correctionModeEnabled()) {
+      <div class="w-100 d-flex flex-row expander justify-content-center align-content-center">
+        <div (click)="switchCorrectionPanel()">
+          <div class="correction-panel-chevron" [ngClass]="correctionPanelExpanded() && correctionModeEnabled()? 'expanded' : 'collapsed'">
+            <mat-icon>expand_more</mat-icon>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
 </div>

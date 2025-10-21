@@ -1,9 +1,8 @@
-import {AfterViewInit, Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {IonContent} from '@ionic/angular/standalone';
 import {CourtComponent} from '../../court/court.component';
 import {PlayerListComponent} from '../../player-list/player-list.component';
 import {ScoreboardComponent} from '../../scoreboard/scoreboard.component';
-import {GestureController} from '@ionic/angular';
 
 @Component({
   selector: 'app-game-page-tab',

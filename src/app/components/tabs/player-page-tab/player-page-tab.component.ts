@@ -2,7 +2,7 @@ import {Component, inject, OnInit, signal, viewChild} from '@angular/core';
 import {
   IonContent,
   IonFab,
-  IonFabButton,
+  IonFabButton, IonFabList,
   IonIcon,
   IonItem,
   IonItemOption,
@@ -16,6 +16,7 @@ import {PlayerPostionShortPipe} from '../../../pipes/player-postion-short-pipe';
 import {Player} from '../../../models/player';
 import {FormsModule} from '@angular/forms';
 import {PlayerModalComponent} from '../../player-modal/player-modal.component';
+import {ImportPlayerModalComponent} from '../../import-player-modal/import-player-modal.component';
 
 @Component({
   selector: 'app-player-page-tab',
@@ -34,7 +35,9 @@ import {PlayerModalComponent} from '../../player-modal/player-modal.component';
     IonItemOption,
     PlayerPostionShortPipe,
     FormsModule,
-    PlayerModalComponent
+    PlayerModalComponent,
+    ImportPlayerModalComponent,
+    IonFabList
   ]
 })
 export class PlayerPageTabComponent  implements OnInit {
@@ -59,5 +62,9 @@ export class PlayerPageTabComponent  implements OnInit {
   public openEditModal(player: Player) {
     this.editPlayerModel.set(player);
     this.editPlayerModal()?.openModal();
+  }
+
+  public importPlayerList(key: string) {
+    this.playerService.importPlayerFromExistingList(key);
   }
 }

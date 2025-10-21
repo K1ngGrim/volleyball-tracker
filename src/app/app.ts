@@ -2,7 +2,7 @@ import {Component, inject, OnDestroy, signal} from '@angular/core';
 import {GameService} from './services/game.service';
 import {IonApp, IonRouterOutlet} from '@ionic/angular/standalone';
 import {addIcons} from 'ionicons';
-import {add, chevronUp, library, playCircle, radio, search} from 'ionicons/icons';
+import {add, chevronUp, library, playCircle, radio, search, logInOutline} from 'ionicons/icons';
 import {ActivationStart, Router} from '@angular/router';
 
 @Component({
@@ -29,7 +29,7 @@ export class App implements OnDestroy {
       }
     });
 
-    addIcons({ library, playCircle, radio, search, add, chevronUp});
+    addIcons({ library, playCircle, radio, search, add, chevronUp, logInOutline});
   }
 
   ngOnDestroy() {

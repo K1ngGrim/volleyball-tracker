@@ -9,6 +9,36 @@
   border-radius: 0 0 8px 8px;
 }
 
+.scoreboard-extension {
+  background: var(--ion-background-color-step-50);
+}
+
+.correction-panel {
+  overflow: hidden;
+  transition: max-height 0.8s ease-in-out;
+
+  &.opened {
+    max-height: 500px;
+  }
+
+  &.closed {
+    max-height: 0;
+  }
+}
+
+.correction-panel-chevron {
+  overflow: hidden;
+  transition: rotate 0.2s ease-in-out;
+
+  &.expanded {
+    rotate: 180deg;
+  }
+
+  &.collapsed {
+    rotate: 0deg;
+  }
+}
+
 .score {
   font-size: 3rem;
   font-weight: bold;

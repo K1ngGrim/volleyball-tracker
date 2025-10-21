@@ -25,11 +25,27 @@
   </ion-list>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button id="open-modal">
+    <ion-fab-button>
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
+
+    <ion-fab-list side="top">
+      <ion-fab-button id="open-modal">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-button id="open-list-modal">
+        <ion-icon name="log-in-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
   </ion-fab>
 </ion-content>
+
+<app-import-player-modal
+  (modalSave)="importPlayerList($event)"
+  trigger="open-list-modal"
+>
+
+</app-import-player-modal>
 
 <app-player-modal
   (modalSave)="submitPlayer($event)"

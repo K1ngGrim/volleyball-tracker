@@ -1,19 +1,21 @@
 <div class="d-flex flex-column w-100">
-  <div class="d-flex flex-row mx-auto p-3 player-list-toggle" (click)="togglePlayerList()">
-    @if (playerListOpened()) {
-      <span>Close</span>
-    } @else {
-      <span>Open</span>
-    }
+  <div class="d-flex flex-row mx-auto px-4 py-1 player-list-toggle" (click)="togglePlayerList()">
+    <div class="player-list-chevron" [ngClass]="playerListOpened() ? 'expanded' : 'collapsed'">
+      <mat-icon>expand_more</mat-icon>
+    </div>
   </div>
 
   <div class="d-flex flex-row w-100 overflow-x-auto player-list-container" [ngClass]="playerListOpened()? 'opened': 'closed'">
     @for (player of playerService.players(); track player) {
-
-    <div class="d-flex flex-column player-card p-4 gap-2" (click)="selectPlayer(player)" [ngClass]="playerSelected(player)? 'selected':null">
-      <span style="font-size: 2rem; color: lightgray" class="align-self-center">{{player.number}}</span>
-      <span style="text-align: center;">{{player.name}}</span>
-    </div>
+      <div class="d-flex flex-column player-card p-4 gap-2" (click)="selectPlayer(player)"
+           [ngClass]="{
+              'selected': playerSelected(player),
+              'libero': player.position == PlayerPosition.Libero
+            }"
+      >
+        <span style="font-size: 2rem; color: lightgray" class="align-self-center">{{player.number}}</span>
+        <span style="text-align: center;">{{player.name}}</span>
+      </div>
 
   }
   </div>

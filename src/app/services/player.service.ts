@@ -7,55 +7,8 @@ import {Player, PlayerPosition} from "../models/player";
 export class PlayerService {
 
   public readonly selectedPlayer = signal<Player | null>(null);
-  public readonly rotation = signal<number>(0);
-
   public readonly players = signal<Player[]>([
-    {
-      name: 'Player 1',
-      number: 1,
-      position: PlayerPosition.OppositeHitter
 
-    },
-    {
-      name: 'Player 2',
-      number: 2,
-      position: PlayerPosition.Libero
-    },
-    {
-      name: 'Player 3',
-      number: 3,
-      position: PlayerPosition.MiddleBlocker
-    },
-    {
-      name: 'Player 1',
-      number: 4,
-      position: PlayerPosition.OppositeHitter
-    },
-    {
-      name: 'Player 2',
-      number: 5,
-      position: PlayerPosition.Libero
-    },
-    {
-      name: 'Player 3',
-      number: 6,
-      position: PlayerPosition.MiddleBlocker
-    },
-    {
-      name: 'Player 1',
-      number: 7,
-      position: PlayerPosition.OppositeHitter
-    },
-    {
-      name: 'Player 2',
-      number: 8,
-      position: PlayerPosition.Libero
-    },
-    {
-      name: 'Player 3',
-      number: 9,
-      position: PlayerPosition.MiddleBlocker
-    }
   ]);
 
   constructor() {
@@ -63,6 +16,10 @@ export class PlayerService {
       const current = this.players();
       localStorage.setItem('players', JSON.stringify(current));
     });
+  }
+
+  public importPlayerFromExistingList(key: string) {
+    this.players.set(PlayerLists.get(key.toUpperCase())??[])
   }
 
   public addPlayer(player: Player) {
@@ -75,10 +32,68 @@ export class PlayerService {
 
   public removePlayer(playerNumber: number) {
     this.players.set(this.players().filter(p => p.number !== playerNumber));
-    // this.playerStats.update(map => {
-    //   map.delete(playerNumber);
-    //   return map;
-    // });
   }
 
 }
+
+export const PlayerLists = new Map<string, Player[]>([
+  ["PSKH3",
+  [
+    {
+      name: 'Ramin Eslami',
+      number: 1,
+      position: PlayerPosition.Setter
+    },
+    {
+      name: 'David Midle',
+      number: 2,
+      position: PlayerPosition.Setter
+    },
+    {
+      name: 'Raffael de Araujo',
+      number: 3,
+      position: PlayerPosition.OppositeHitter
+    },
+    {
+      name: 'Florian Kaiser',
+      number: 5,
+      position: PlayerPosition.OutsideHitter
+    },
+    {
+      name: 'Frederik Hille',
+      number: 7,
+      position: PlayerPosition.MiddleBlocker
+    },
+    {
+      name: 'Kevin Campione',
+      number: 8,
+      position: PlayerPosition.MiddleBlocker
+    },
+    {
+      name: 'Ian Tuero',
+      number: 9,
+      position: PlayerPosition.MiddleBlocker
+    },
+    {
+      name: 'Julius Wittorski',
+      number: 11,
+      position: PlayerPosition.OutsideHitter
+    },
+    {
+      name: 'Martin Erndwein',
+      number: 12,
+      position: PlayerPosition.Libero
+    },
+    {
+      name: 'Tim Knöpfle',
+      number: 15,
+      position: PlayerPosition.OutsideHitter
+    },
+    {
+      name: 'Jannik Jessen',
+      number: 20,
+      position: PlayerPosition.MiddleBlocker
+    }
+  ]
+  ],
+]);

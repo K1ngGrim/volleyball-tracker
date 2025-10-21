@@ -3,10 +3,6 @@ export function isFrontRow(position: number): boolean {
 }
 
 
-export function teamHasWonSet(teamScore: number, opponentScore: number): boolean {
-  return teamScore >= 25 && (teamScore - opponentScore) >= 2;
-}
-
 export function getOrCreate<K, V>(map: Map<K, V>, key: K, create: () => V): V {
   if (!map.has(key)) {
     const value = create();

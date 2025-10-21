@@ -1,8 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {IonIcon, IonLabel, IonRouterOutlet, IonTab, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
-import {PlayerPageTabComponent} from '../tabs/player-page-tab/player-page-tab.component';
-import {GamePageTabComponent} from '../tabs/game-page-tab/game-page-tab.component';
-import {HistoryPageTabComponent} from '../tabs/history-page-tab/history-page-tab.component';
+import {IonIcon, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-tabs-page',
@@ -12,13 +9,7 @@ import {HistoryPageTabComponent} from '../tabs/history-page-tab/history-page-tab
     IonTabs,
     IonTabBar,
     IonTabButton,
-    IonIcon,
-    IonRouterOutlet,
-    IonTab,
-    PlayerPageTabComponent,
-    GamePageTabComponent,
-    HistoryPageTabComponent,
-    IonLabel
+    IonIcon
   ]
 })
 export class TabsPageComponent  implements OnInit {

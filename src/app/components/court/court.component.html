@@ -11,7 +11,9 @@
               <div class="d-flex w-100 h-100 flex-column">
                 @if (state.rotation[pos-1]; as player) {
                   @if (player) {
-                    <div class="justify-content-center d-flex align-items-center align-content-center w-100 py-2 player-slot" [ngClass]="{'libero': player.isLibero}">
+                    <div class="justify-content-center d-flex align-items-center align-content-center w-100 py-2 player-slot"
+                         [ngClass]="{'libero': player.position == PlayerPosition.Libero}"
+                    >
                       <span style="height: fit-content; width: fit-content; font-size: 1rem;">{{ player.name }}</span>
                     </div>
 

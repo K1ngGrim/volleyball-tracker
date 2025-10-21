@@ -3,12 +3,14 @@ import {NgClass} from '@angular/common';
 import {GameService} from '../../services/game.service';
 import {MatDialog} from '@angular/material/dialog';
 import {PlayerService} from '../../services/player.service';
-import {Player} from '../../models/player';
+import {Player, PlayerPosition} from '../../models/player';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-player-list',
   imports: [
-    NgClass
+    NgClass,
+    MatIcon
   ],
   templateUrl: './player-list.component.html',
   styleUrl: './player-list.component.scss'
@@ -34,4 +36,6 @@ export class PlayerListComponent {
     this.playerService.selectedPlayer.set(player);
     this.cdr.detectChanges();
   }
+
+  protected readonly PlayerPosition = PlayerPosition;
 }

@@ -1,7 +1,6 @@
 export interface Player {
   number: number;
   name: string;
-  isLibero?: boolean;
   playerChangedFor?: Player;
   position?: PlayerPosition;
 }

@@ -1,7 +1,7 @@
 import {computed, Injectable, signal} from '@angular/core';
-import {downloadCsv, getOrCreate, isFrontRow, teamHasWonSet} from '../helper/Helper';
+import {downloadCsv, getOrCreate, isFrontRow} from '../helper/Helper';
 import {Actions} from '../components/court/court.component';
-import {Player} from '../models/player';
+import {Player, PlayerPosition} from '../models/player';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +15,9 @@ export class GameService {
     homeScore: 0,
     awayScore: 0,
     currentServer: 'home',
-    currentSet: 1,
-    homeSetsWon: 1,
-    awaySetsWon: 2,
+    currentSet: 0,
+    homeSetsWon: 0,
+    awaySetsWon: 0,
     rotation: Array(6).fill(null)
   });
 
@@ -98,7 +98,7 @@ export class GameService {
 
   public updateSetPoints(team: 'home' | 'away', correctionMode: -1 | 1 | null = null) {
     let state = this.gameState();
-    if (this.started()) {
+    if (this.started() && !correctionMode) {
       //current state (as a reference)
 
       this.setHistory.update(x => {
@@ -107,7 +107,7 @@ export class GameService {
 
       this.redoStack.set([]);
 
-      const hasToRotate = state.currentServer !== team;
+      const hasToRotate = state.currentServer !== team && team == 'home';
 
       state = {
         ...state,
@@ -117,6 +117,8 @@ export class GameService {
       }
 
       const pointDifference = state.homeScore - state.awayScore;
+
+      this.gameState.set(state);
 
       if (Math.abs(pointDifference) >= 2 && (state.homeScore >= 25 || state.awayScore >= 25)) {
         // Set is won
@@ -141,12 +143,16 @@ export class GameService {
 
 
       }
+
+      if (hasToRotate) this.rotate();
     }else if (this.correctModeActive() && correctionMode) {
       state = {
         ...state,
         homeScore: team == 'home' ? state.homeScore + correctionMode : state.homeScore,
         awayScore: team == 'away' ? state.awayScore + correctionMode : state.awayScore,
       }
+
+      this.gameState.set(state);
     }
   }
 
@@ -183,10 +189,9 @@ export class GameService {
   }
 
   public setPlayer(player: Player, position: number) {
-
     if(this.notStarted()) {
 
-      if (player.isLibero) {
+      if (player.position == PlayerPosition.Libero) {
         alert('Please set the libero position after the match has started.');
         return;
       }
@@ -197,35 +202,41 @@ export class GameService {
       if(oldPosition !== -1) current[oldPosition] = null;
 
       current[position] = player;
-      this.gameState.update(x => {
-        return {
-          ...x,
-          rotation: current
-        };
-      });
-
+      this.updateRotation(current);
     }else if(this.started()){
-      if(player.isLibero) {
+
+      if(this.correctModeActive()){
+        if(player.position == PlayerPosition.Libero && isFrontRow(position)) return;
+
+        const current = [...this.currentRotation()];
+
+        const containsLibero = current.find(p => p?.position == PlayerPosition.Libero);
+        if(containsLibero) return;
+
+        const oldPosition = current.findIndex(p => p?.number === player.number);
+        if(oldPosition !== -1) current[oldPosition] = null;
+
+        current[position] = player;
+        this.updateRotation(current, true);
+        return;
+      }
+
+      if(player.position == PlayerPosition.Libero) {
         if(isFrontRow(position)) return;
 
         const current = [...this.currentRotation()];
 
-        const containsLibero = current.find(p => p?.isLibero);
+        const containsLibero = current.find(p => p?.position == PlayerPosition.Libero);
         if(containsLibero) return;
 
         const oldPlayer = current[position];
         if(oldPlayer) {
-          if(oldPlayer.isLibero) return;
+          if(oldPlayer.position == PlayerPosition.Libero) return;
 
-          // player.liberoChangedFor = oldPlayer;
+          player.playerChangedFor = oldPlayer;
 
           current[position] = player;
-          this.gameState.update(x => {
-            return {
-              ...x,
-              rotation: current
-            };
-          });
+          this.updateRotation(current);
         }
       }else {
         const current = [...this.currentRotation()];
@@ -233,53 +244,41 @@ export class GameService {
 
         if(oldPlayer) {
 
-          // if(oldPlayer.PlayerChangedFor) {
-          //   if(player.number !== oldPlayer.PlayerChangedFor.number) {
-          //     alert("This position can only be changed back to the original player. Player " + oldPlayer.PlayerChangedFor.number);
-          //   }else {
-          //     current[position] = oldPlayer.PlayerChangedFor;
-          //     oldPlayer.PlayerChangedFor = undefined;
-          //     this.gameState.update(x => {
-          //       return {
-          //         ...x,
-          //         rotation: current
-          //       };
-          //     });
-          //   }
-          // }else {
-          //   if (oldPlayer.isLibero) {
-          //     if(oldPlayer.liberoChangedFor) {
-          //       if(oldPlayer.liberoChangedFor.number !== player.number) {
-          //         alert("This position can only be changed back to the original player. Player " + oldPlayer.liberoChangedFor.number);
-          //         return;
-          //       }else {
-          //         current[position] = oldPlayer.liberoChangedFor;
-          //         oldPlayer.liberoChangedFor = undefined;
-          //         this.gameState.update(x => {
-          //           return {
-          //             ...x,
-          //             rotation: current
-          //           };
-          //         });
-          //       }
-          //
-          //     }
-          //   }else {
-          //     player.PlayerChangedFor = oldPlayer;
-          //     current[position] = player;
-          //     this.gameState.update(x => {
-          //       return {
-          //         ...x,
-          //         rotation: current
-          //       };
-          //     });
-          //   }
-          // }
+          if(oldPlayer.playerChangedFor) {
+            if(player.number !== oldPlayer.playerChangedFor.number) {
+              alert("This position can only be changed back to the original player. Player " + oldPlayer.playerChangedFor.number);
+            }else {
+              current[position] = oldPlayer.playerChangedFor;
+              oldPlayer.playerChangedFor = undefined;
+              this.updateRotation(current);
+            }
+          } else {
+            current[position] = player;
+            player.playerChangedFor = oldPlayer;
+            this.updateRotation(current);
+          }
         }
       }
     }
   }
 
+
+  private updateRotation(rotation: (Player | null)[], noHistory: boolean = false) {
+    if(!noHistory) {
+      this.setHistory.update(x => {
+        return [...x, structuredClone(this.gameState())];
+      });
+    }
+
+    this.gameState.update(x => {
+      return {
+        ...x,
+        rotation: rotation
+      };
+    });
+
+    console.log(this.gameState());
+  }
 
   private rotate() {
     const state = this.gameState();
@@ -289,7 +288,7 @@ export class GameService {
     const first = current.shift()!;
     let newRotation = [...current, first];
 
-    const liberoIndex = newRotation.findIndex(p => p?.isLibero);
+    const liberoIndex = newRotation.findIndex(p => p?.position == PlayerPosition.Libero);
     if(liberoIndex !== -1) {
       const libero = newRotation[liberoIndex]!;
       if(libero.playerChangedFor) {
